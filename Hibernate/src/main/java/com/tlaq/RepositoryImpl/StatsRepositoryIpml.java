@@ -1,0 +1,83 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.tlaq.RepositoryImpl;
+
+import com.tlaq.hibernate.HibernateUtils;
+import com.tlaq.pojo.OrderDetail;
+import com.tlaq.pojo.Product;
+import com.tlaq.pojo.SaleOrder;
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import java.util.List;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author QUI
+ */
+public class StatsRepositoryIpml {
+    public List<Object[]> statsRevenueByProduct(){
+        try(Session s= HibernateUtils.getFACTORY().openSession()){
+            CriteriaBuilder b = s.getCriteriaBuilder();
+            CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+            Root root = q.from(OrderDetail.class);
+            Join<OrderDetail, Product> join = root.join("productId", JoinType.RIGHT);
+            
+            q.multiselect(join.get("id"), join.get("name"), 
+                    b.sum(b.prod(root.get("unitPrice"), root.get("quantity"))));
+            q.groupBy(join.get("id"));
+            
+            Query query = s.createQuery(q);
+            return query.getResultList();
+        }
+    }
+    
+    public List<Object[]> statsRevenueByTime(String time, int year){
+        try(Session s= HibernateUtils.getFACTORY().openSession()){
+            CriteriaBuilder b = s.getCriteriaBuilder();
+            CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+            Root root = q.from(OrderDetail.class);
+            Join<OrderDetail, SaleOrder> join = root.join("orderId", JoinType.INNER);
+            
+            q.multiselect(b.function(time, Integer.class, join.get("createdDate")), 
+                b.sum(b.prod(root.get("unitPrice"), root.get("quantity"))));
+                q.where(b.equal(b.function("YEAR", Integer.class, join.get("createdDate")), year));
+                
+            q.groupBy(b.function(time, Integer.class, join.get("createdDate")));
+            
+            Query query = s.createQuery(q);
+            return query.getResultList();
+        }
+    }
+    
+    public Product getProductById(int id){
+        try(Session s = HibernateUtils.getFACTORY().openSession()){
+            return s.get(Product.class , id);
+        }
+    }
+    
+    public void deleteProduct(int id){
+        try(Session s = HibernateUtils.getFACTORY().openSession()){
+            Product p = this.getProductById(id);
+            s.remove(p);
+        }
+    }
+    
+    public Product addOrUpdate(Product p){
+        try(Session s = HibernateUtils.getFACTORY().openSession()){
+            if (p.getId()== null){
+                s.persist(p);
+            }else {
+                s.merge(p);
+            }
+            s.refresh(p);
+            return p;
+        }
+    }
+}
