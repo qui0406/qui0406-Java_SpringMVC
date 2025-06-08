@@ -1,9 +1,9 @@
+package com.tlaq.repositories.impl;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tlaq.repositories.impl;
-
 
 import com.tlaq.pojo.Product;
 import com.tlaq.repositories.ProductRepository;
@@ -15,6 +15,7 @@ import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
- * @author QUI
+ * @author admin
  */
 @Repository
 @Transactional
@@ -83,7 +84,6 @@ public class ProductRepositoryImpl implements ProductRepository {
 
         return query.getResultList();
 
-
     }
 
     @Override
@@ -109,7 +109,9 @@ public class ProductRepositoryImpl implements ProductRepository {
         } else {
             s.merge(p);
         }
+
         s.refresh(p);
+
         return p;
 
     }
