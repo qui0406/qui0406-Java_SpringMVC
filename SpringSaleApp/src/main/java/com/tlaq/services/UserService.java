@@ -4,10 +4,16 @@
  */
 package com.tlaq.services;
 
+import com.tlaq.pojo.User;
+import java.util.Map;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
+
 /**
  *
  * @author QUI
  */
-public interface UserService {
-    
+public interface UserService extends UserDetailsService{
+    User getUserByUserName(String username);
+    User register(Map<String, String> params, MultipartFile avatar);
 }

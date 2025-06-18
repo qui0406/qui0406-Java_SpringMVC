@@ -4,13 +4,10 @@
  */
 package com.tlaq.repositories;
 
-import com.tlaq.pojo.User;
-
 /**
  *
  * @author QUI
  */
-public interface UserRepository {
-    User getUserByUserName(String username);
-    User register(User u);
+public interface ReceiptRepository {
+    
 }
